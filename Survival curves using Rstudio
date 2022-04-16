@@ -1,0 +1,37 @@
+#To generate survival curve
+> library(survival)
+> summary(mydataframeS) 
+> mydataframeS$Gender <- as.factor(mydataframeS$Gender) #Gender is factor variable
+> str(mydataframeS)
+> Surv(time = mydataframeS$Time, event = mydataframeS$Event == 1) #Survival times until event
+> summary(Surv(time = mydataframeS$Time, event = mydataframeS$Event == 1)) 
+> Y = Surv(mydataframeS$Time, mydataframeS$Event == 1) 
+> kmfit = survfit(Y ~ mydataframeS$Gender) 
+> summary(kmfit, times = c(seq(0,220, by = 50))) 
+>  par(mar=c(1,1,1,1)) 
+> par(pin=c(4,3), mai=c(1,1,1,3))
+> plot(kmfit, lty = c("solid", "dashed"), col = c("black", "grey"), xlab = "Survival Time", ylab = "Survival Probabilities")
+> legend("topright", c("Female", "Male"), lty = c("solid", "dashed"), col = c("black", "grey")) 
+
+
+#Log-Rank test comparing survival curves: survdiff()
+> survdiff(formula = Surv(mydataframeS$Time, mydataframeS$Event) ~ Gender, data = mydataframeS)
+
+
+#Plotting Survival curves using ggplot2 and ggfortify libraries
+> library(ggplot2)
+> library(ggfortify) 
+> model_fit <- survfit(Surv(mydataframeS$Time, mydataframeS$Event) ~ mydataframeS$Gender, data = mydataframeS) 
+>autoplot(model_fit) + 
+ labs(x = "\n Survival Time (Days) ", y = "Survival Probabilities \n", 
+ title = "Survival Times Of \n Gastric Cancer Patients \n") + 
+ theme(plot.title = element_text(hjust = 0.5), 
+ axis.title.x = element_text(face="bold", colour="#FF7A33", size = 12),
+ axis.title.y = element_text(face="bold", colour="#FF7A33", size = 12),
+ legend.title = element_text(face="bold", size = 10))
+
+#Plotting Survival curves using ggplot2, survminer and ggsurvplot libraries
+> library(ggplot2)
+> library(survminer)
+> model_fit <- survfit(Surv(mydataframeS$Time, mydataframeS$Event) ~ mydataframeS$Gender, data = mydataframeS) 
+> ggsurvplot(model_fit)
