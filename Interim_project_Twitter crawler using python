@@ -170,3 +170,49 @@ plt.show()
 
 
 ##Loading the results to a SQL Database
+#Importing the necessary libraries
+import sqlalchemy as db 
+from sqlalchemy import MetaData
+meta = MetaData()
+from sqlalchemy import Table, Column, Integer, String,MetaData
+meta = MetaData()
+from sqlalchemy.schema import CreateTable
+import psycopg2
+
+# Create connection engine
+engine = db.create_engine('postgresql://postgres:admin@localhost:5432/project2') 
+#user postgres, password admin - change yours accordingly. Also check the port number
+conn = engine.raw_connection()
+
+
+##To create tables holding the following informations: User_id, id, handle, user_description, user_location
+commands = (# TABLE 1: user_info
+            '''CREATE TABLE IF NOT EXISTS user_info(
+twitter_user_id varchar(500), 
+tweet_id varchar(500), 
+twitter_handle varchar(500),
+twitter_user_description varchar(2000),
+twitter_user_location varchar(500));''')
+
+# Initialize connection to PostgreSQL
+cur = conn.cursor()
+table_count = 0
+
+# Create cursor to execute SQL commands
+cur.execute(commands)
+table_count += 1
+
+# Close communication with server
+conn.commit()
+cur.close()
+conn.close()
+
+print(str(table_count),"table(s) have been created in PostgreSQL.")
+
+##Loading information from CSV to SQL
+##We had to pre-split the information we needed into CSV files
+df=pd.read_csv(r'C:\Users\user\Desktop\juypter\interim project\Assignment\user_info.csv')
+df.to_sql(name= 'user_info', con= engine, if_exists= 'append', index= False)
+pd.read_sql("SELECT * FROM user_info", conn)
+
+#Repeat the same steps to create and load information into Tables 2 and 3
